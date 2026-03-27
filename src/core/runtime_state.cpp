@@ -152,14 +152,17 @@ anolis::deviceprovider::v1::CapabilitySet build_ph_capabilities(const ProviderCo
 anolis::deviceprovider::v1::Device build_descriptor(const ProviderConfig &config,
                                                     const DeviceSpec &spec) {
     anolis::deviceprovider::v1::Device descriptor;
+    const std::string formatted_address = format_i2c_address(spec.address);
     descriptor.set_device_id(spec.id);
     descriptor.set_provider_name("anolis-provider-ezo");
     descriptor.set_type_id(type_id_for_device(spec.type));
     descriptor.set_type_version("1");
     descriptor.set_label(spec.label.empty() ? spec.id : spec.label);
-    descriptor.set_address(format_i2c_address(spec.address));
+    descriptor.set_address(formatted_address);
+    (*descriptor.mutable_tags())["hw.bus_path"] = config.bus_path;
+    (*descriptor.mutable_tags())["hw.i2c_address"] = formatted_address;
     (*descriptor.mutable_tags())["bus_path"] = config.bus_path;
-    (*descriptor.mutable_tags())["i2c_address"] = format_i2c_address(spec.address);
+    (*descriptor.mutable_tags())["i2c_address"] = formatted_address;
     (*descriptor.mutable_tags())["configured_type"] = to_string(spec.type);
     return descriptor;
 }
@@ -423,7 +426,7 @@ i2c::Status refresh_ph_sample(const std::string &device_id) {
         std::lock_guard<std::mutex> lock(g_mutex);
         auto it = find_active_device_unlocked(g_state.active_devices, device_id);
         if(it == g_state.active_devices.end()) {
-            return make_status(i2c::StatusCode::InvalidArgument, "unknown device_id");
+            return make_status(i2c::StatusCode::NotFound, "unknown device_id");
         }
         config = g_state.config;
         spec = it->spec;
@@ -435,7 +438,7 @@ i2c::Status refresh_ph_sample(const std::string &device_id) {
         std::lock_guard<std::mutex> lock(g_mutex);
         auto it = find_active_device_unlocked(g_state.active_devices, device_id);
         if(it == g_state.active_devices.end()) {
-            return make_status(i2c::StatusCode::InvalidArgument, "unknown device_id");
+            return make_status(i2c::StatusCode::NotFound, "unknown device_id");
         }
 
         const uint64_t sequence = ++it->sample.sequence;
@@ -488,7 +491,7 @@ i2c::Status refresh_ph_sample(const std::string &device_id) {
         std::lock_guard<std::mutex> lock(g_mutex);
         auto it = find_active_device_unlocked(g_state.active_devices, device_id);
         if(it == g_state.active_devices.end()) {
-            return make_status(i2c::StatusCode::InvalidArgument, "unknown device_id");
+            return make_status(i2c::StatusCode::NotFound, "unknown device_id");
         }
 
         if(status.is_ok()) {

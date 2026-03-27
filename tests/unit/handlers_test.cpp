@@ -86,7 +86,10 @@ TEST(HandlersTest, ListDevicesReturnsOnlyActivePhaseThreeInventory) {
     ASSERT_EQ(response.list_devices().devices_size(), 1);
     EXPECT_EQ(response.list_devices().devices(0).device_id(), "ph0");
     EXPECT_EQ(response.list_devices().devices(0).type_id(), "sensor.ezo.ph");
-    EXPECT_GE(response.list_devices().device_health_size(), 1);
+    EXPECT_EQ(response.list_devices().devices(0).tags().at("hw.bus_path"), "mock://unit-test-i2c");
+    EXPECT_EQ(response.list_devices().devices(0).tags().at("hw.i2c_address"), "0x63");
+    ASSERT_EQ(response.list_devices().device_health_size(), 1);
+    EXPECT_EQ(response.list_devices().device_health(0).device_id(), "ph0");
 }
 
 TEST(HandlersTest, DescribeDeviceReturnsCapabilitiesForPhDevice) {

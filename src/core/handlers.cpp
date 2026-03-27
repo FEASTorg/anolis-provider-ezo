@@ -47,6 +47,8 @@ Status::Code map_i2c_status_code(i2c::StatusCode code) {
         return Status::CODE_OK;
     case i2c::StatusCode::InvalidArgument:
         return Status::CODE_INVALID_ARGUMENT;
+    case i2c::StatusCode::NotFound:
+        return Status::CODE_NOT_FOUND;
     case i2c::StatusCode::Unavailable:
         return Status::CODE_UNAVAILABLE;
     case i2c::StatusCode::DeadlineExceeded:
@@ -174,7 +176,7 @@ void handle_list_devices(const ListDevicesRequest &request, Response &response) 
         *out->add_devices() = device.descriptor;
     }
     if(request.include_health()) {
-        for(const auto &entry : health::make_device_health(state)) {
+        for(const auto &entry : health::make_device_health(state, false)) {
             *out->add_device_health() = entry;
         }
     }

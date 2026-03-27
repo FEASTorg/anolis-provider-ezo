@@ -9,6 +9,7 @@ namespace anolis_provider_ezo::i2c {
 enum class StatusCode {
     Ok = 0,
     InvalidArgument,
+    NotFound,
     Unavailable,
     DeadlineExceeded,
     Cancelled,

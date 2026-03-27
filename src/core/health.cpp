@@ -69,9 +69,11 @@ ProviderHealth make_provider_health(const runtime::RuntimeState &state) {
     return health;
 }
 
-std::vector<DeviceHealth> make_device_health(const runtime::RuntimeState &state) {
+std::vector<DeviceHealth> make_device_health(const runtime::RuntimeState &state,
+                                             bool include_excluded) {
     std::vector<DeviceHealth> devices;
-    devices.reserve(state.active_devices.size() + state.excluded_devices.size());
+    devices.reserve(state.active_devices.size() +
+                    (include_excluded ? state.excluded_devices.size() : 0));
 
     const auto now = std::chrono::system_clock::now();
     const auto stale_after = stale_after_ms(state);
@@ -121,15 +123,17 @@ std::vector<DeviceHealth> make_device_health(const runtime::RuntimeState &state)
         devices.push_back(std::move(health));
     }
 
-    for(const auto &excluded : state.excluded_devices) {
-        DeviceHealth health;
-        health.set_device_id(excluded.spec.id);
-        health.set_state(DeviceHealth::STATE_UNREACHABLE);
-        health.set_message(excluded.reason);
-        (*health.mutable_metrics())["excluded"] = "true";
-        (*health.mutable_metrics())["type"] = to_string(excluded.spec.type);
-        (*health.mutable_metrics())["address"] = format_i2c_address(excluded.spec.address);
-        devices.push_back(std::move(health));
+    if(include_excluded) {
+        for(const auto &excluded : state.excluded_devices) {
+            DeviceHealth health;
+            health.set_device_id(excluded.spec.id);
+            health.set_state(DeviceHealth::STATE_UNREACHABLE);
+            health.set_message(excluded.reason);
+            (*health.mutable_metrics())["excluded"] = "true";
+            (*health.mutable_metrics())["type"] = to_string(excluded.spec.type);
+            (*health.mutable_metrics())["address"] = format_i2c_address(excluded.spec.address);
+            devices.push_back(std::move(health));
+        }
     }
 
     return devices;
