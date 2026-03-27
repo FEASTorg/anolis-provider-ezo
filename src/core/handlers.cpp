@@ -65,7 +65,9 @@ std::chrono::system_clock::time_point from_proto_timestamp(
     const google::protobuf::Timestamp &timestamp) {
     const auto seconds = std::chrono::seconds(timestamp.seconds());
     const auto nanos = std::chrono::nanoseconds(timestamp.nanos());
-    return std::chrono::system_clock::time_point(seconds + nanos);
+    const auto duration = std::chrono::duration_cast<std::chrono::system_clock::duration>(
+        seconds + nanos);
+    return std::chrono::system_clock::time_point(duration);
 }
 
 google::protobuf::Timestamp to_proto_timestamp(
