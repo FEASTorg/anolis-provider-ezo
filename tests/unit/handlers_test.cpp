@@ -21,7 +21,7 @@ anolis_provider_ezo::ProviderConfig make_stub_config() {
     return config;
 }
 
-TEST(HandlersTest, HelloReturnsProviderMetadata) {
+TEST(HandlersTest, HelloReturnsPhaseThreeMetadata) {
     anolis_provider_ezo::runtime::reset();
     anolis_provider_ezo::runtime::initialize(make_stub_config());
 
@@ -34,8 +34,8 @@ TEST(HandlersTest, HelloReturnsProviderMetadata) {
 
     EXPECT_EQ(response.status().code(), anolis::deviceprovider::v1::Status::CODE_OK);
     EXPECT_EQ(response.hello().provider_name(), "anolis-provider-ezo");
-    EXPECT_EQ(response.hello().metadata().at("discovery_mode"), "manual");
-    EXPECT_EQ(response.hello().metadata().at("i2c_execution_model"), "single_executor");
+    EXPECT_EQ(response.hello().metadata().at("phase"), "3");
+    EXPECT_EQ(response.hello().metadata().at("vertical_slice"), "ph");
 }
 
 TEST(HandlersTest, HelloRejectsWrongProtocolVersion) {
@@ -51,7 +51,7 @@ TEST(HandlersTest, HelloRejectsWrongProtocolVersion) {
     EXPECT_EQ(response.status().code(), anolis::deviceprovider::v1::Status::CODE_FAILED_PRECONDITION);
 }
 
-TEST(HandlersTest, WaitReadyAndGetHealthReturnOk) {
+TEST(HandlersTest, WaitReadyAndGetHealthReflectActiveAndExcludedDevices) {
     anolis_provider_ezo::runtime::reset();
     anolis_provider_ezo::runtime::initialize(make_stub_config());
 
@@ -61,27 +61,81 @@ TEST(HandlersTest, WaitReadyAndGetHealthReturnOk) {
         wait_response);
     EXPECT_EQ(wait_response.status().code(), anolis::deviceprovider::v1::Status::CODE_OK);
     EXPECT_EQ(wait_response.wait_ready().diagnostics().at("ready"), "true");
+    EXPECT_EQ(wait_response.wait_ready().diagnostics().at("active_device_count"), "1");
+    EXPECT_EQ(wait_response.wait_ready().diagnostics().at("excluded_device_count"), "1");
 
     anolis::deviceprovider::v1::Response health_response;
     anolis_provider_ezo::handlers::handle_get_health(
         anolis::deviceprovider::v1::GetHealthRequest{},
         health_response);
     EXPECT_EQ(health_response.status().code(), anolis::deviceprovider::v1::Status::CODE_OK);
-    EXPECT_EQ(health_response.get_health().provider().state(),
-              anolis::deviceprovider::v1::ProviderHealth::STATE_OK);
+    EXPECT_EQ(health_response.get_health().devices_size(), 2);
 }
 
-TEST(HandlersTest, ListDevicesIsEmptyInPhaseTwoSkeleton) {
+TEST(HandlersTest, ListDevicesReturnsOnlyActivePhaseThreeInventory) {
     anolis_provider_ezo::runtime::reset();
     anolis_provider_ezo::runtime::initialize(make_stub_config());
 
+    anolis::deviceprovider::v1::ListDevicesRequest request;
+    request.set_include_health(true);
+
     anolis::deviceprovider::v1::Response response;
-    anolis_provider_ezo::handlers::handle_list_devices(
-        anolis::deviceprovider::v1::ListDevicesRequest{},
-        response);
+    anolis_provider_ezo::handlers::handle_list_devices(request, response);
 
     EXPECT_EQ(response.status().code(), anolis::deviceprovider::v1::Status::CODE_OK);
-    EXPECT_EQ(response.list_devices().devices_size(), 0);
+    ASSERT_EQ(response.list_devices().devices_size(), 1);
+    EXPECT_EQ(response.list_devices().devices(0).device_id(), "ph0");
+    EXPECT_EQ(response.list_devices().devices(0).type_id(), "sensor.ezo.ph");
+    EXPECT_GE(response.list_devices().device_health_size(), 1);
+}
+
+TEST(HandlersTest, DescribeDeviceReturnsCapabilitiesForPhDevice) {
+    anolis_provider_ezo::runtime::reset();
+    anolis_provider_ezo::runtime::initialize(make_stub_config());
+
+    anolis::deviceprovider::v1::DescribeDeviceRequest request;
+    request.set_device_id("ph0");
+
+    anolis::deviceprovider::v1::Response response;
+    anolis_provider_ezo::handlers::handle_describe_device(request, response);
+
+    EXPECT_EQ(response.status().code(), anolis::deviceprovider::v1::Status::CODE_OK);
+    EXPECT_EQ(response.describe_device().device().device_id(), "ph0");
+    ASSERT_EQ(response.describe_device().capabilities().signals_size(), 1);
+    EXPECT_EQ(response.describe_device().capabilities().signals(0).signal_id(), "ph.value");
+}
+
+TEST(HandlersTest, ReadSignalsReturnsPhValue) {
+    anolis_provider_ezo::runtime::reset();
+    anolis_provider_ezo::runtime::initialize(make_stub_config());
+
+    anolis::deviceprovider::v1::ReadSignalsRequest request;
+    request.set_device_id("ph0");
+    request.add_signal_ids("ph.value");
+
+    anolis::deviceprovider::v1::Response response;
+    anolis_provider_ezo::handlers::handle_read_signals(request, response);
+
+    EXPECT_EQ(response.status().code(), anolis::deviceprovider::v1::Status::CODE_OK);
+    EXPECT_EQ(response.read_signals().device_id(), "ph0");
+    ASSERT_EQ(response.read_signals().values_size(), 1);
+    EXPECT_EQ(response.read_signals().values(0).signal_id(), "ph.value");
+    EXPECT_EQ(response.read_signals().values(0).value().type(),
+              anolis::deviceprovider::v1::VALUE_TYPE_DOUBLE);
+}
+
+TEST(HandlersTest, ReadSignalsRejectsUnknownSignalId) {
+    anolis_provider_ezo::runtime::reset();
+    anolis_provider_ezo::runtime::initialize(make_stub_config());
+
+    anolis::deviceprovider::v1::ReadSignalsRequest request;
+    request.set_device_id("ph0");
+    request.add_signal_ids("ph.bad");
+
+    anolis::deviceprovider::v1::Response response;
+    anolis_provider_ezo::handlers::handle_read_signals(request, response);
+
+    EXPECT_EQ(response.status().code(), anolis::deviceprovider::v1::Status::CODE_NOT_FOUND);
 }
 
 } // namespace

@@ -31,7 +31,7 @@ void print_usage(const char *program_name) {
         << "  " << program_name << " --version\n"
         << "  " << program_name << " --check-config <path>\n"
         << "  " << program_name << " --config <path>\n\n"
-        << "Implements ADPP v1 provider skeleton for EZO devices.\n";
+        << "Implements ADPP v1 provider for EZO devices.\n";
 }
 
 class RuntimeShutdownGuard {
@@ -135,10 +135,14 @@ int main(int argc, char **argv) {
             anolis_provider_ezo::handlers::handle_wait_ready(request.wait_ready(), response);
         } else if(request.has_list_devices()) {
             anolis_provider_ezo::handlers::handle_list_devices(request.list_devices(), response);
+        } else if(request.has_describe_device()) {
+            anolis_provider_ezo::handlers::handle_describe_device(request.describe_device(), response);
+        } else if(request.has_read_signals()) {
+            anolis_provider_ezo::handlers::handle_read_signals(request.read_signals(), response);
+        } else if(request.has_call()) {
+            anolis_provider_ezo::handlers::handle_call(request.call(), response);
         } else if(request.has_get_health()) {
             anolis_provider_ezo::handlers::handle_get_health(request.get_health(), response);
-        } else if(request.has_describe_device() || request.has_read_signals() || request.has_call()) {
-            anolis_provider_ezo::handlers::handle_unimplemented(response);
         } else {
             anolis_provider_ezo::handlers::handle_unimplemented(response);
         }

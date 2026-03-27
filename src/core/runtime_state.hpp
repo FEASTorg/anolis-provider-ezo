@@ -1,15 +1,48 @@
 #pragma once
 
 #include <chrono>
+#include <cstdint>
 #include <string>
+#include <vector>
 
 #include "config/provider_config.hpp"
 #include "i2c/bus_executor.hpp"
+#include "protocol.pb.h"
 
 namespace anolis_provider_ezo::runtime {
 
+using CapabilitySet = anolis::deviceprovider::v1::CapabilitySet;
+using Device = anolis::deviceprovider::v1::Device;
+
+struct PhSampleCache {
+    bool has_sample = false;
+    bool last_read_ok = false;
+    double value = 0.0;
+    std::chrono::system_clock::time_point sampled_at{};
+    std::string last_error;
+    uint64_t success_count = 0;
+    uint64_t failure_count = 0;
+    uint64_t sequence = 0;
+};
+
+struct ActiveDevice {
+    DeviceSpec spec;
+    Device descriptor;
+    CapabilitySet capabilities;
+    std::string startup_product_code;
+    std::string startup_firmware_version;
+    PhSampleCache sample;
+};
+
+struct ExcludedDevice {
+    DeviceSpec spec;
+    std::string reason;
+};
+
 struct RuntimeState {
     ProviderConfig config;
+    std::vector<ActiveDevice> active_devices;
+    std::vector<ExcludedDevice> excluded_devices;
     bool ready = false;
     std::string startup_message;
     std::chrono::system_clock::time_point started_at;
@@ -25,5 +58,6 @@ RuntimeState snapshot();
 i2c::Status submit_i2c_job(const std::string &job_name,
                            std::chrono::milliseconds timeout,
                            i2c::BusExecutor::Job job);
+i2c::Status refresh_ph_sample(const std::string &device_id);
 
 } // namespace anolis_provider_ezo::runtime

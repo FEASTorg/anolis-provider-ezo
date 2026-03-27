@@ -18,6 +18,9 @@ using WaitReadyRequest = anolis::deviceprovider::v1::WaitReadyRequest;
 void handle_hello(const HelloRequest &request, Response &response);
 void handle_wait_ready(const WaitReadyRequest &request, Response &response);
 void handle_list_devices(const ListDevicesRequest &request, Response &response);
+void handle_describe_device(const DescribeDeviceRequest &request, Response &response);
+void handle_read_signals(const ReadSignalsRequest &request, Response &response);
+void handle_call(const CallRequest &request, Response &response);
 void handle_get_health(const GetHealthRequest &request, Response &response);
 void handle_unimplemented(Response &response, const std::string &message = "operation not implemented");
 
