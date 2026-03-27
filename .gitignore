@@ -39,3 +39,10 @@
 
 # debug information files
 *.dwo
+
+# Build outputs
+build/
+Testing/
+
+# Local working notes
+working/
