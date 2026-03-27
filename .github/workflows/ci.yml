@@ -1,0 +1,89 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+    paths-ignore:
+      - "docs/**"
+      - "working/**"
+      - "**/*.md"
+      - "**/*.png"
+      - "**/*.svg"
+  pull_request:
+    branches: [main]
+    paths-ignore:
+      - "docs/**"
+      - "working/**"
+      - "**/*.md"
+      - "**/*.png"
+      - "**/*.svg"
+  workflow_dispatch:
+
+concurrency:
+  group: provider-ezo-ci-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  VCPKG_COMMIT: "66c0373dc7fca549e5803087b9487edfe3aca0a1"
+
+permissions:
+  contents: read
+
+jobs:
+  build-and-test:
+    name: ${{ matrix.name }}
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: ${{ matrix.timeout_minutes }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: Linux Build and Test (no hardware)
+            os: ubuntu-24.04
+            configure_preset: dev-release
+            build_preset: dev-release
+            test_preset: dev-release
+            timeout_minutes: 30
+          - name: Windows Build and Test (no hardware)
+            os: windows-2022
+            configure_preset: dev-windows-release
+            build_preset: dev-windows-release
+            test_preset: dev-windows-release
+            timeout_minutes: 45
+
+    steps:
+      - name: Checkout anolis-provider-ezo
+        uses: actions/checkout@v4
+        with:
+          path: anolis-provider-ezo
+          submodules: recursive
+
+      - name: Checkout ezo-driver
+        uses: actions/checkout@v4
+        with:
+          repository: FEASTorg/ezo-driver
+          path: anolis-provider-ezo/external/ezo-driver
+
+      - name: Install Linux build tools
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y cmake ninja-build g++
+
+      - name: Setup vcpkg
+        uses: lukka/run-vcpkg@v11
+        with:
+          vcpkgGitCommitId: ${{ env.VCPKG_COMMIT }}
+          doNotCache: false
+
+      - name: Configure
+        working-directory: anolis-provider-ezo
+        run: cmake --preset ${{ matrix.configure_preset }}
+
+      - name: Build
+        working-directory: anolis-provider-ezo
+        run: cmake --build --preset ${{ matrix.build_preset }} --parallel
+
+      - name: Test
+        working-directory: anolis-provider-ezo
+        run: ctest --preset ${{ matrix.test_preset }}
