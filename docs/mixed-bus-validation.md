@@ -1,9 +1,10 @@
 # Mixed-Bus Validation
 
-This repository uses a minimal two-profile flow:
+This repository uses a minimal profile flow:
 
 1. Windows mock validation.
-2. Linux real-hardware validation.
+2. Linux real-hardware baseline validation.
+3. Linux real-hardware lab validation.
 
 Canonical inputs:
 
@@ -13,4 +14,5 @@ Canonical inputs:
 Pass criteria:
 
 1. Windows mock profile starts and serves runtime endpoints.
-2. Linux hardware profile starts and `check_mixed_bus_http.sh` exits `0`.
+2. Linux baseline profile starts and `check_mixed_bus_http.sh` exits `0`.
+3. Linux lab profile starts and `check_mixed_bus_http.sh` exits `0` with expected lab inventory.

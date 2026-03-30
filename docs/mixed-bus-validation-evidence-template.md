@@ -19,12 +19,25 @@
 7. Result: PASS/FAIL
 8. Notes:
 
-## B) Linux Hardware Validation
+## B) Linux Baseline Hardware Validation
 
 1. Runtime config: `config/mixed-bus/anolis-runtime.mixed-baseline.yaml`
 2. Provider configs:
    - `config/mixed-bus/provider-bread.baseline.yaml`
    - `config/mixed-bus/provider-ezo.baseline.yaml`
+3. Hardware topology summary:
+4. `check_mixed_bus_http.sh` command used:
+5. Script output summary:
+6. Captured artifacts directory:
+7. Result: PASS/FAIL
+8. Notes:
+
+## C) Linux Lab Hardware Validation
+
+1. Runtime config: `config/mixed-bus/anolis-runtime.mixed-lab.yaml`
+2. Provider configs:
+   - `config/mixed-bus/provider-bread.lab.yaml`
+   - `config/mixed-bus/provider-ezo.lab.yaml`
 3. Hardware topology summary:
 4. `check_mixed_bus_http.sh` command used:
 5. Script output summary:

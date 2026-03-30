@@ -2,7 +2,7 @@
 
 Use these exact commands.
 
-## A) Windows Mock Test (PowerShell, no WSL)
+## A) Windows Mock Validation (PowerShell)
 
 ### 1) Start runtime (Terminal A)
 
@@ -30,9 +30,9 @@ Expected:
 
 Note:
 
-1. On Windows mock path, `bread0` may log `no hardware session`; that is expected for this local mock validation.
+1. On Windows mock path, `bread0` may log `no hardware session`; that is expected.
 
-## B) Linux Real Hardware Validation
+## B) Linux Baseline Hardware Validation
 
 ### 1) Start runtime (Terminal A)
 
@@ -52,8 +52,28 @@ cd /path/to/anolis-provider-ezo
   --capture-dir artifacts/mixed-bus-validation/baseline
 ```
 
+## C) Linux Lab Hardware Validation (RLHT 0x0A, DCMT 0x14/0x15, pH 0x63, DO 0x61)
+
+### 1) Start runtime (Terminal A)
+
+```bash
+cd /path/to/anolis
+./build/dev-release/anolis-runtime --config ../anolis-provider-ezo/config/mixed-bus/anolis-runtime.mixed-lab.yaml
+```
+
+### 2) Validate endpoints (Terminal B)
+
+```bash
+cd /path/to/anolis-provider-ezo
+./scripts/mixed-bus/check_mixed_bus_http.sh \
+  --base-url http://127.0.0.1:8080 \
+  --expect-providers bread0,ezo0 \
+  --min-device-count 5 \
+  --capture-dir artifacts/mixed-bus-validation/lab
+```
+
 Expected:
 
-1. Script exits `0`.
-2. Runtime and provider health endpoints return `status.code = OK`.
-3. Artifacts are written to `artifacts/mixed-bus-validation/baseline`.
+1. Runtime and both providers are `AVAILABLE`.
+2. Inventory includes 5 devices total (`rlht0`, `dcmt0`, `dcmt1`, `ph0`, `do0`).
+3. Script exits `0` and writes artifacts.
