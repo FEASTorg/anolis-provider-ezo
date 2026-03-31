@@ -112,6 +112,8 @@ Windows:
 3. HTTP validation script (Linux hardware path): `scripts/mixed-bus/check_mixed_bus_http.sh`
 4. Validation summary: `docs/mixed-bus-validation.md`
 
+For Linux mixed-bus baseline and lab runs, `anolis-provider-bread` must be built with `dev-linux-hardware-release`.
+
 ## Docs
 
 1. [docs/README.md](docs/README.md)

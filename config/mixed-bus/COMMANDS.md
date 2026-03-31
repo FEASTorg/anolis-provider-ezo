@@ -14,8 +14,8 @@ cmake --preset dev-release
 cmake --build --preset dev-release
 
 cd /path/to/anolis-provider-bread
-cmake --preset dev-release
-cmake --build --preset dev-release
+cmake --preset dev-linux-hardware-release
+cmake --build --preset dev-linux-hardware-release
 
 cd /path/to/anolis-provider-ezo
 cmake --preset dev-release
@@ -113,3 +113,6 @@ Expected:
 1. Runtime and both providers are `AVAILABLE`.
 2. Inventory includes 5 devices total (`rlht0`, `dcmt0`, `dcmt1`, `ph0`, `do0`).
 3. Script exits `0` and writes artifacts.
+
+If you see repeated `no hardware session (provider not built with hardware support)` from `bread0`,
+rebuild `anolis-provider-bread` with `dev-linux-hardware-release` and rerun.

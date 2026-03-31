@@ -11,10 +11,12 @@ This directory contains canonical runtime/provider config sets for running `brea
 2. `anolis-runtime.mixed-baseline.yaml`
    - Linux real-hardware baseline validation.
    - Uses `provider-bread.baseline.yaml` + `provider-ezo.baseline.yaml`.
+   - Requires `anolis-provider-bread` built with `dev-linux-hardware-release`.
    - HTTP port `8080`.
 3. `anolis-runtime.mixed-lab.yaml`
    - Linux real-hardware lab profile for current topology.
    - Uses `provider-bread.lab.yaml` + `provider-ezo.lab.yaml`.
+   - Requires `anolis-provider-bread` built with `dev-linux-hardware-release`.
    - HTTP port `8080`.
 
 ## Provider configs

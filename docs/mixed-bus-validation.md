@@ -11,6 +11,8 @@ Canonical inputs:
 1. Config pack: [`config/mixed-bus/`](../config/mixed-bus/README.md)
 2. Commands: [`config/mixed-bus/COMMANDS.md`](../config/mixed-bus/COMMANDS.md) (includes preset-based build prerequisites)
 
+Linux hardware profiles require `anolis-provider-bread` built with the `dev-linux-hardware-release` preset.
+
 Pass criteria:
 
 1. Windows mock profile starts and serves runtime endpoints.
