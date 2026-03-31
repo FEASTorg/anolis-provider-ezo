@@ -11,13 +11,16 @@
 ## A) Windows Mock Validation
 
 1. Runtime config: `config/mixed-bus/anolis-runtime.mixed-baseline.windows.mock.yaml`
-2. Commands used: (from `config/mixed-bus/COMMANDS.md`)
-3. `/v0/runtime/status` summary:
-4. `/v0/providers/health` summary:
-5. `/v0/devices` summary:
-6. `/v0/state` summary:
-7. Result: PASS/FAIL
-8. Notes:
+2. Provider configs:
+   - `config/mixed-bus/provider-bread.baseline.mock.yaml`
+   - `config/mixed-bus/provider-ezo.baseline.mock.yaml`
+3. Commands used: (from `config/mixed-bus/COMMANDS.md`)
+4. `/v0/runtime/status` summary:
+5. `/v0/providers/health` summary:
+6. `/v0/devices` summary:
+7. `/v0/state` summary:
+8. Result: PASS/FAIL
+9. Notes:
 
 ## B) Linux Baseline Hardware Validation
 

@@ -113,6 +113,7 @@ Windows:
 4. Validation summary: `docs/mixed-bus-validation.md`
 
 For Linux mixed-bus baseline and lab runs, `anolis-provider-bread` must be built with `dev-linux-hardware-release`.
+Those Linux profiles set `hardware.require_live_session: true` in bread config so startup fails fast if bread is built without hardware support.
 
 ## Docs
 

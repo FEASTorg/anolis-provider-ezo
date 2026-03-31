@@ -114,5 +114,6 @@ Expected:
 2. Inventory includes 5 devices total (`rlht0`, `dcmt0`, `dcmt1`, `ph0`, `do0`).
 3. Script exits `0` and writes artifacts.
 
-If you see repeated `no hardware session (provider not built with hardware support)` from `bread0`,
+If `bread0` fails startup with
+`hardware.require_live_session=true but provider was built without hardware support`,
 rebuild `anolis-provider-bread` with `dev-linux-hardware-release` and rerun.

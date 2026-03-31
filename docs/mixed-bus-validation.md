@@ -12,6 +12,7 @@ Canonical inputs:
 2. Commands: [`config/mixed-bus/COMMANDS.md`](../config/mixed-bus/COMMANDS.md) (includes preset-based build prerequisites)
 
 Linux hardware profiles require `anolis-provider-bread` built with the `dev-linux-hardware-release` preset.
+The bread provider configs enforce this via `hardware.require_live_session: true` (fail-fast startup guard).
 
 Pass criteria:
 
