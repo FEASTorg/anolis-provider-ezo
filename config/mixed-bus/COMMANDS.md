@@ -72,6 +72,9 @@ Note:
 
 ## B) Linux Baseline Hardware Validation
 
+This baseline profile is aligned to the current lab hardware map:
+RLHT `0x0A`, DCMT `0x14`, DCMT `0x15`, EZO pH `0x63`, EZO DO `0x61`.
+
 ### 1) Start runtime (Terminal A)
 
 ```bash
@@ -86,11 +89,14 @@ cd /path/to/anolis-provider-ezo
 ./scripts/mixed-bus/check_mixed_bus_http.sh \
   --base-url http://127.0.0.1:8080 \
   --expect-providers bread0,ezo0 \
-  --min-device-count 2 \
+  --min-device-count 5 \
   --capture-dir artifacts/mixed-bus-validation/baseline
 ```
 
 ## C) Linux Lab Hardware Validation (RLHT 0x0A, DCMT 0x14/0x15, pH 0x63, DO 0x61)
+
+This lab profile is aligned with CRUMBS `mixed_bus_lab_validation` hardware addressing.
+Optional Bosch sensor checks from CRUMBS (`0x76`/`0x77`) are not included in provider validation.
 
 ### 1) Start runtime (Terminal A)
 

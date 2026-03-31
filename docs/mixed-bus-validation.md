@@ -20,5 +20,7 @@ In `anolis-provider-ezo`, `dev-linux-hardware-*` presets are cross-provider nami
 Pass criteria:
 
 1. Windows mock profile starts and serves runtime endpoints.
-2. Linux baseline profile starts and `check_mixed_bus_http.sh` exits `0`.
+2. Linux baseline profile starts and `check_mixed_bus_http.sh` exits `0` with 5-device inventory.
 3. Linux lab profile starts and `check_mixed_bus_http.sh` exits `0` with expected lab inventory.
+4. Linux lab expected inventory aligns with CRUMBS lab validation map: `rlht0@0x0A`, `dcmt0@0x14`, `dcmt1@0x15`, `ph0@0x63`, `do0@0x61`.
+5. Bosch optional validation from CRUMBS (`0x76`/`0x77`) remains outside provider mixed-bus scope.

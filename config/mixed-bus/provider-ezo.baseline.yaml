@@ -19,7 +19,3 @@ devices:
     type: do
     label: Tank Dissolved Oxygen
     address: 0x61
-  - id: ec0
-    type: ec
-    label: Tank Conductivity
-    address: 0x64

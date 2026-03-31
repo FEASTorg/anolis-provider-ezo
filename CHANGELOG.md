@@ -13,6 +13,7 @@ All notable changes to `anolis-provider-ezo` are documented in this file.
 3. Updated docs to reference the minimal baseline workflow with descriptive names.
 4. Flattened `docs/` into canonical top-level documents and removed nested directory structure.
 5. Aligned Linux hardware preset naming with provider-bread by adding `dev-linux-hardware-*` aliases in provider-ezo and updating mixed-bus configs/runbooks to use them.
+6. Updated Linux mixed-bus baseline provider configs to match the active CRUMBS lab hardware map (`0x0A`, `0x14`, `0x15`, `0x63`, `0x61`) to avoid accidental baseline/lab address divergence.
 
 ### Removed
 
