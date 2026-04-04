@@ -1,5 +1,10 @@
 #include "i2c/ezo_i2c_bridge.hpp"
 
+/**
+ * @file ezo_i2c_bridge.cpp
+ * @brief Glue that adapts the provider's session abstraction to the EZO C driver callbacks.
+ */
+
 #include <cstddef>
 #include <string>
 
@@ -18,6 +23,8 @@ ezo_result_t transport_write_then_read(void *context,
     }
 
     auto *session = static_cast<ISession *>(context);
+    // The EZO C library only understands its own result enum, so provider
+    // status richness is collapsed at the bridge boundary.
     const Status status = session->write_then_read(address,
                                                    tx_data,
                                                    tx_len,
@@ -43,6 +50,8 @@ Status make_status(StatusCode code, const std::string &message) {
 Status bind_ezo_i2c_device(ISession &session,
                            uint8_t address,
                            EzoDeviceBinding &binding) {
+    // Initialization binds the C driver to a borrowed session pointer; the
+    // provider retains ownership and serialized access through the executor.
     const ezo_result_t init_result =
         ezo_device_init(&binding.device, address, transport_adapter(), &session);
     if(init_result != EZO_OK) {

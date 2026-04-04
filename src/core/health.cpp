@@ -1,5 +1,10 @@
 #include "core/health.hpp"
 
+/**
+ * @file health.cpp
+ * @brief Health and readiness projection derived from EZO runtime sampling state.
+ */
+
 #include <algorithm>
 #include <chrono>
 #include <cstdint>
@@ -35,6 +40,8 @@ google::protobuf::Timestamp to_proto_timestamp(
 ProviderHealth make_provider_health(const runtime::RuntimeState &state) {
     ProviderHealth health;
     const bool degraded = !state.ready || !state.excluded_devices.empty();
+    // Provider health is intentionally startup- and executor-centric: excluded
+    // devices and a stopped bus executor both surface as degraded provider state.
     health.set_state(degraded ? ProviderHealth::STATE_DEGRADED : ProviderHealth::STATE_OK);
     health.set_message(degraded ? "degraded" : "ok");
 
@@ -120,6 +127,8 @@ std::vector<DeviceHealth> make_device_health(const runtime::RuntimeState &state,
             *health.mutable_last_seen() = to_proto_timestamp(device.sample.sampled_at);
 
             if(!device.sample.last_read_ok) {
+                // Failed reads do not immediately erase the last good sample;
+                // they downgrade health while the cached value remains inspectable.
                 health.set_state(DeviceHealth::STATE_FAULT);
                 health.set_message("latest read failed; cached sample may be stale");
             } else if(age_ms.count() > stale_after) {
@@ -156,6 +165,8 @@ std::vector<DeviceHealth> make_device_health(const runtime::RuntimeState &state,
         for(const auto &excluded : state.excluded_devices) {
             DeviceHealth health;
             health.set_device_id(excluded.spec.id);
+            // Excluded devices stay visible so operators can distinguish a bad
+            // startup identity check from a device that was never configured.
             health.set_state(DeviceHealth::STATE_UNREACHABLE);
             health.set_message(excluded.reason);
             (*health.mutable_metrics())["excluded"] = "true";
@@ -184,6 +195,8 @@ void populate_wait_ready(const runtime::RuntimeState &state, WaitReadyResponse &
     }
 
     (*out.mutable_diagnostics())["ready"] = state.ready ? "true" : "false";
+    // WaitReady mirrors the same executor and roster diagnostics exposed by
+    // provider health so callers can gate startup without extra API calls.
     (*out.mutable_diagnostics())["init_time_ms"] = "0";
     (*out.mutable_diagnostics())["uptime_ms"] = std::to_string(uptime);
     (*out.mutable_diagnostics())["configured_device_count"] =

@@ -1,5 +1,10 @@
 #include "core/transport/framed_stdio.hpp"
 
+/**
+ * @file framed_stdio.cpp
+ * @brief Blocking framed stdio helpers used by the provider's ADPP request loop.
+ */
+
 namespace anolis_provider_ezo::transport {
 namespace {
 
@@ -43,6 +48,8 @@ bool read_frame(std::istream &input, std::vector<uint8_t> &out, std::string &err
 
     input.read(reinterpret_cast<char *>(header), 1);
     if(input.gcount() == 0) {
+        // EOF before the next header starts is treated as a clean shutdown by
+        // the caller rather than as a framing error.
         return false;
     }
     if(!read_exact(input, header + 1, 3)) {
@@ -61,6 +68,8 @@ bool read_frame(std::istream &input, std::vector<uint8_t> &out, std::string &err
     }
 
     out.assign(size, 0);
+    // The framing layer guarantees all-or-nothing payload delivery so protobuf
+    // decoding above it never sees partial ADPP messages.
     if(!read_exact(input, out.data(), size)) {
         error = "unexpected EOF while reading frame payload";
         return false;

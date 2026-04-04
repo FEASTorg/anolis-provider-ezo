@@ -1,5 +1,10 @@
 #include "config/provider_config.hpp"
 
+/**
+ * @file provider_config.cpp
+ * @brief YAML parsing and semantic validation for anolis-provider-ezo configuration.
+ */
+
 #include <filesystem>
 #include <iomanip>
 #include <regex>
@@ -151,6 +156,8 @@ ProviderConfig load_config(const std::string &path) {
     }
 
     ensure_map(root, "root");
+    // Keep the accepted schema intentionally narrow so manual-config drift is
+    // rejected before startup touches the shared I2C bus.
     reject_unknown_keys(root, "root", {"provider", "hardware", "discovery", "devices"});
 
     ProviderConfig config;
@@ -192,6 +199,8 @@ ProviderConfig load_config(const std::string &path) {
     reject_unknown_keys(discovery_node, "discovery", {"mode"});
 
     const std::string mode = require_scalar(discovery_node["mode"], "discovery.mode");
+    // EZO v1 is deliberately manual-only so every runtime device has a known
+    // expected identity before the provider probes the bus.
     if(mode != "manual") {
         throw std::runtime_error("discovery.mode must be 'manual' for anolis-provider-ezo v1");
     }
@@ -232,6 +241,8 @@ ProviderConfig load_config(const std::string &path) {
                              : spec.id;
             spec.address = parse_address_value(device_node["address"], "devices[" + std::to_string(i) + "].address");
 
+            // IDs and addresses must be unique because health, call routing,
+            // and startup exclusion diagnostics all key off these identities.
             if(!seen_ids.insert(spec.id).second) {
                 throw std::runtime_error("Duplicate devices[].id: '" + spec.id + "'");
             }
@@ -248,6 +259,8 @@ ProviderConfig load_config(const std::string &path) {
 
 std::string summarize_config(const ProviderConfig &config) {
     std::ostringstream out;
+    // Startup logs use a compact summary rather than dumping the full device
+    // list; the detailed roster already exists in the config file itself.
     out << "provider.name=" << config.provider_name
         << ", hardware.bus_path=" << config.bus_path
         << ", hardware.query_delay_us=" << config.query_delay_us
