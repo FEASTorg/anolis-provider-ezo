@@ -14,57 +14,58 @@ namespace {
 
 class TempConfigFile {
 public:
-    explicit TempConfigFile(const std::string &yaml_body) {
-        static std::atomic<unsigned long long> counter{0ULL};
-        const auto nonce = std::chrono::steady_clock::now().time_since_epoch().count();
-        const auto id = counter.fetch_add(1ULL, std::memory_order_relaxed);
+  explicit TempConfigFile(const std::string &yaml_body) {
+    static std::atomic<unsigned long long> counter{0ULL};
+    const auto nonce =
+        std::chrono::steady_clock::now().time_since_epoch().count();
+    const auto id = counter.fetch_add(1ULL, std::memory_order_relaxed);
 
-        path_ = std::filesystem::temp_directory_path() /
-                ("anolis_provider_ezo_config_test_" + std::to_string(nonce) + "_" +
-                 std::to_string(id) + ".yaml");
+    path_ = std::filesystem::temp_directory_path() /
+            ("anolis_provider_ezo_config_test_" + std::to_string(nonce) + "_" +
+             std::to_string(id) + ".yaml");
 
-        std::ofstream out(path_);
-        if(!out.is_open()) {
-            throw std::runtime_error("failed to create temp config: " + path_.string());
-        }
-        out << yaml_body;
-        out.flush();
-        if(!out.good()) {
-            throw std::runtime_error("failed to write temp config: " + path_.string());
-        }
+    std::ofstream out(path_);
+    if (!out.is_open()) {
+      throw std::runtime_error("failed to create temp config: " +
+                               path_.string());
     }
-
-    ~TempConfigFile() {
-        std::error_code ec;
-        std::filesystem::remove(path_, ec);
+    out << yaml_body;
+    out.flush();
+    if (!out.good()) {
+      throw std::runtime_error("failed to write temp config: " +
+                               path_.string());
     }
+  }
 
-    const std::filesystem::path &path() const {
-        return path_;
-    }
+  ~TempConfigFile() {
+    std::error_code ec;
+    std::filesystem::remove(path_, ec);
+  }
+
+  const std::filesystem::path &path() const { return path_; }
 
 private:
-    std::filesystem::path path_;
+  std::filesystem::path path_;
 };
 
 void expect_config_error(const std::string &yaml_body,
                          const std::string &expected_token) {
-    const TempConfigFile config(yaml_body);
-    try {
-        (void)load_config(config.path().string());
-        FAIL() << "Expected load_config() to fail";
-    } catch(const std::runtime_error &e) {
-        const std::string message = e.what();
-        EXPECT_NE(message.find(expected_token), std::string::npos)
-            << "expected token: " << expected_token
-            << "\nactual message: " << message;
-    }
+  const TempConfigFile config(yaml_body);
+  try {
+    (void)load_config(config.path().string());
+    FAIL() << "Expected load_config() to fail";
+  } catch (const std::runtime_error &e) {
+    const std::string message = e.what();
+    EXPECT_NE(message.find(expected_token), std::string::npos)
+        << "expected token: " << expected_token
+        << "\nactual message: " << message;
+  }
 }
 
 } // namespace
 
 TEST(ProviderConfigTest, ParsesManualModeWithAllEzoTypes) {
-    const TempConfigFile config(R"(
+  const TempConfigFile config(R"(
 provider:
   name: ezo-lab
 hardware:
@@ -92,25 +93,26 @@ devices:
     address: 0x6f
 )");
 
-    const ProviderConfig parsed = load_config(config.path().string());
-    EXPECT_EQ(parsed.provider_name, "ezo-lab");
-    EXPECT_EQ(parsed.bus_path, "/dev/i2c-1");
-    ASSERT_EQ(parsed.devices.size(), 6U);
-    EXPECT_EQ(parsed.devices[0].type, EzoDeviceType::Ph);
-    EXPECT_EQ(parsed.devices[5].type, EzoDeviceType::Hum);
+  const ProviderConfig parsed = load_config(config.path().string());
+  EXPECT_EQ(parsed.provider_name, "ezo-lab");
+  EXPECT_EQ(parsed.bus_path, "/dev/i2c-1");
+  ASSERT_EQ(parsed.devices.size(), 6U);
+  EXPECT_EQ(parsed.devices[0].type, EzoDeviceType::Ph);
+  EXPECT_EQ(parsed.devices[5].type, EzoDeviceType::Hum);
 }
 
 TEST(ProviderConfigTest, RejectsDiscoveryModeOtherThanManual) {
-    expect_config_error(R"(
+  expect_config_error(R"(
 hardware:
   bus_path: /dev/i2c-1
 discovery:
   mode: scan
-)", "discovery.mode");
+)",
+                      "discovery.mode");
 }
 
 TEST(ProviderConfigTest, RejectsDuplicateAddresses) {
-    expect_config_error(R"(
+  expect_config_error(R"(
 hardware:
   bus_path: /dev/i2c-1
 discovery:
@@ -122,11 +124,12 @@ devices:
   - id: do0
     type: do
     address: 99
-)", "Duplicate devices[].address");
+)",
+                      "Duplicate devices[].address");
 }
 
 TEST(ProviderConfigTest, RejectsUnknownDeviceType) {
-    expect_config_error(R"(
+  expect_config_error(R"(
 hardware:
   bus_path: /dev/i2c-1
 discovery:
@@ -135,7 +138,8 @@ devices:
   - id: x0
     type: xyz
     address: 0x61
-)", "Invalid devices[].type");
+)",
+                      "Invalid devices[].type");
 }
 
 } // namespace anolis_provider_ezo

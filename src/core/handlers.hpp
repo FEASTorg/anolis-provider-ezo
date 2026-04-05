@@ -20,7 +20,8 @@ using ReadSignalsRequest = anolis::deviceprovider::v1::ReadSignalsRequest;
 using Response = anolis::deviceprovider::v1::Response;
 using WaitReadyRequest = anolis::deviceprovider::v1::WaitReadyRequest;
 
-/** @brief Handle the ADPP `Hello` handshake and advertise provider capabilities. */
+/** @brief Handle the ADPP `Hello` handshake and advertise provider
+ * capabilities. */
 void handle_hello(const HelloRequest &request, Response &response);
 
 /** @brief Report provider readiness and startup diagnostics. */
@@ -30,10 +31,12 @@ void handle_wait_ready(const WaitReadyRequest &request, Response &response);
 void handle_list_devices(const ListDevicesRequest &request, Response &response);
 
 /** @brief Describe one active device and its fixed capability surface. */
-void handle_describe_device(const DescribeDeviceRequest &request, Response &response);
+void handle_describe_device(const DescribeDeviceRequest &request,
+                            Response &response);
 
 /**
- * @brief Return signal values for one device, refreshing the cached sample when needed.
+ * @brief Return signal values for one device, refreshing the cached sample when
+ * needed.
  */
 void handle_read_signals(const ReadSignalsRequest &request, Response &response);
 
@@ -45,7 +48,9 @@ void handle_call(const CallRequest &request, Response &response);
 /** @brief Return provider and device health summaries. */
 void handle_get_health(const GetHealthRequest &request, Response &response);
 
-/** @brief Return a standard unimplemented response for unsupported operations. */
-void handle_unimplemented(Response &response, const std::string &message = "operation not implemented");
+/** @brief Return a standard unimplemented response for unsupported operations.
+ */
+void handle_unimplemented(Response &response, const std::string &message =
+                                                  "operation not implemented");
 
 } // namespace anolis_provider_ezo::handlers

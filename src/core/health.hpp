@@ -2,7 +2,8 @@
 
 /**
  * @file health.hpp
- * @brief Health and readiness projection helpers for the EZO provider runtime state.
+ * @brief Health and readiness projection helpers for the EZO provider runtime
+ * state.
  */
 
 #include <vector>
@@ -24,6 +25,7 @@ std::vector<DeviceHealth> make_device_health(const runtime::RuntimeState &state,
                                              bool include_excluded = true);
 
 /** @brief Populate the ADPP `WaitReady` response from runtime state. */
-void populate_wait_ready(const runtime::RuntimeState &state, WaitReadyResponse &out);
+void populate_wait_ready(const runtime::RuntimeState &state,
+                         WaitReadyResponse &out);
 
 } // namespace anolis_provider_ezo::health
