@@ -134,9 +134,12 @@ Windows:
 3. Validation summary: `docs/mixed-bus-validation.md`
 
 For Linux mixed-bus hardware runs:
+
 1. Build `anolis-provider-bread` with `dev-linux-hardware-release`.
 2. Build `anolis-provider-ezo` with `dev-linux-hardware-release`.
-3. `../anolis/config/mixed-bus-providers/provider-bread.yaml` sets `hardware.require_live_session: true` so startup fails fast if bread is built without hardware support.
+3. `../anolis/config/mixed-bus-providers/provider-bread.yaml` sets
+   `hardware.require_live_session: true` so startup fails fast if bread is built
+   without hardware support.
 
 ## Docs
 
