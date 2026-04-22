@@ -133,16 +133,16 @@ Windows:
 
 ## Validation Assets
 
-1. Mixed-bus config pack and runbook: `anolis/config/mixed-bus-providers/` in the `anolishq/anolis` repo
+1. Mixed-bus config pack and runbook: `anolis-projects/projects/mixed-bus-dev/` in the `anolishq/anolis-projects` repo
    (clone separately; these are realization assets, not bundled here)
-2. Canonical HTTP validation script: `check_mixed_bus_http.sh` in that same directory
+2. Canonical HTTP validation script: `validation/check_mixed_bus_http.sh` in that same directory
 3. Validation summary: `docs/mixed-bus-validation.md`
 
 For Linux mixed-bus hardware runs:
 
 1. Build `anolis-provider-bread` with `dev-linux-hardware-release`.
 2. Build `anolis-provider-ezo` with `dev-linux-hardware-release`.
-3. `../anolis/config/mixed-bus-providers/provider-bread.yaml` sets
+3. `../anolis-projects/projects/mixed-bus-dev/config/provider-bread.yaml` sets
    `hardware.require_live_session: true` so startup fails fast if bread is built
    without hardware support.
 
