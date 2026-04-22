@@ -14,10 +14,14 @@ EZO sensor hardware provider for the Anolis runtime.
 
 ## Build
 
-Requires local access to:
+No sibling checkouts required for a standard build.
 
-1. `anolis-protocol` (default: `../anolis-protocol` or `external/anolis-protocol`)
-2. `ezo-driver` (default: `../ezo-driver` or `external/ezo-driver`)
+`anolis-protocol` is fetched automatically at configure time via CMake FetchContent, pinned to the
+release tag declared in `CMakeLists.txt`. `ezo-driver` is resolved via `find_package` from its
+release artifact when `EZO_DRIVER_DIR` is not set.
+
+For active development of `ezo-driver` alongside this repo, clone it as a sibling and pass
+`-DEZO_DRIVER_DIR=../ezo-driver` (or set it in your preset) to override the release artifact lookup.
 
 ### Install Build Dependencies
 
@@ -129,8 +133,9 @@ Windows:
 
 ## Validation Assets
 
-1. Canonical config pack and runbook: `../anolis/config/mixed-bus-providers/`
-2. Canonical HTTP validation script: `../anolis/config/mixed-bus-providers/check_mixed_bus_http.sh`
+1. Mixed-bus config pack and runbook: `anolis/config/mixed-bus-providers/` in the `anolishq/anolis` repo
+   (clone separately; these are realization assets, not bundled here)
+2. Canonical HTTP validation script: `check_mixed_bus_http.sh` in that same directory
 3. Validation summary: `docs/mixed-bus-validation.md`
 
 For Linux mixed-bus hardware runs:
