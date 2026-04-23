@@ -119,3 +119,9 @@ jobs:
       - name: Test
         working-directory: anolis-provider-ezo
         run: ctest --preset ${{ matrix.test_preset }}
+
+  version-sync:
+    uses: anolishq/.github-anolishq/.github/workflows/version-sync.yml@main
+    with:
+      python-version: '3.12'
+      working-directory: '.'
