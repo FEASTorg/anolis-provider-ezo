@@ -4,6 +4,34 @@ All notable changes to `anolis-provider-ezo` are documented in this file.
 
 ## [Unreleased]
 
+## [0.2.2] - 2026-04-23
+
+### Changed
+
+- Validation Assets paths updated to use `anolis-projects` layout.
+- Bump `anolis-protocol` FetchContent pin from `v1.1.3` to `v1.1.4`.
+
+### CI
+
+- Version-sync check wired: `version-locations.txt` added tracking `CMakeLists.txt`
+  and `vcpkg.json`; CI calls reusable `version-sync` workflow from `anolishq/.github`.
+- `vcpkg.json` version aligned to `0.2.0` (was stale at `0.1.0`).
+- `.anpkg` added to `.gitignore`.
+
+### Docs
+
+- Build setup and Validation Asset references updated.
+
+## [0.2.1] - 2026-04-21
+
+### CI
+
+- Add `ci-linux-release` CMake preset with `EZO_DRIVER_DIR`; release workflow
+  updated to use it.
+
+> **Note:** the `v0.2.1` tag was applied to a CI-only commit; version strings in
+> source remained at `0.2.0`. This entry is recorded for completeness.
+
 ## [0.2.0] - 2026-04-21
 
 ### Changed
