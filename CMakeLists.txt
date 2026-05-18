@@ -15,7 +15,9 @@ find_package(Protobuf REQUIRED)
 find_package(yaml-cpp CONFIG REQUIRED)
 find_package(Threads REQUIRED)
 
-# ezo-driver: find_package by default; set EZO_DRIVER_DIR to use a source-tree override.
+include(FetchContent)
+
+# ezo-driver: set EZO_DRIVER_DIR to use a local source-tree override; otherwise fetched from release.
 if(DEFINED EZO_DRIVER_DIR AND NOT EZO_DRIVER_DIR STREQUAL "")
     if(NOT EXISTS "${EZO_DRIVER_DIR}/CMakeLists.txt")
         message(FATAL_ERROR
@@ -32,14 +34,28 @@ if(DEFINED EZO_DRIVER_DIR AND NOT EZO_DRIVER_DIR STREQUAL "")
         add_library(ezo::ezo_core ALIAS ezo_core)
     endif()
 else()
-    find_package(ezo_driver CONFIG REQUIRED)
+    FetchContent_Declare(
+        ezo_driver
+        URL https://github.com/feastorg/ezo-driver/archive/refs/tags/v0.5.1.tar.gz
+        URL_HASH SHA256=dd751af78652b5cce5667887ba1e48bf3ade9a4653273f849f3f545cf2aa5def
+        DOWNLOAD_EXTRACT_TIMESTAMP TRUE
+    )
+    set(EZO_BUILD_TESTS OFF CACHE BOOL "" FORCE)
+    set(EZO_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
+    set(EZO_BUILD_ARDUINO_ADAPTER OFF CACHE BOOL "" FORCE)
+    set(EZO_BUILD_LINUX_ADAPTER OFF CACHE BOOL "" FORCE)
+    set(EZO_BUILD_POSIX_UART_ADAPTER OFF CACHE BOOL "" FORCE)
+    FetchContent_MakeAvailable(ezo_driver)
+    if(NOT TARGET ezo::ezo_core)
+        add_library(ezo::ezo_core ALIAS ezo_core)
+    endif()
 endif()
 
-include(FetchContent)
 FetchContent_Declare(
     anolis_protocol
     URL https://github.com/anolishq/anolis-protocol/releases/download/v1.2.0/anolis-protocol-1.2.0-source.tar.gz
     URL_HASH SHA256=ffd2839e02c5a0f1fe512f618808de8ce138f8dcbfbfb99ea432582ce517f26c
+    DOWNLOAD_EXTRACT_TIMESTAMP TRUE
 )
 FetchContent_MakeAvailable(anolis_protocol)
 set(ADPP_PROTO_IMPORT_ROOT "${anolis_protocol_SOURCE_DIR}/proto")
