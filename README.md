@@ -136,7 +136,7 @@ For Linux mixed-bus hardware runs:
 
 ## Docs
 
-1. [docs/README.md](docs/README.md)
+1. [docs/index.md](docs/index.md)
 2. Planning notes: `working/` (gitignored)
 
 Local API docs: run `doxygen docs/Doxyfile` from the repo root.
